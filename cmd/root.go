@@ -75,6 +75,7 @@ func startServer() (func() error, func(err error)) {
 			a := CreateServer(conf.Server.MusicFolder)
 			a.MountRouter("Subsonic API", consts.URLPathSubsonicAPI, CreateSubsonicAPIRouter())
 			a.MountRouter("Native API", consts.URLPathNativeAPI, CreateNativeAPIRouter())
+			a.MountRouter("LastFM Auth", consts.URLPathNativeAPI+"/lastfm", CreateLastFMRouter())
 			return a.Run(fmt.Sprintf("%s:%d", conf.Server.Address, conf.Server.Port))
 		}, func(err error) {
 			if err != nil {

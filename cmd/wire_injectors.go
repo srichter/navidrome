@@ -5,6 +5,8 @@ package cmd
 import (
 	"sync"
 
+	"github.com/navidrome/navidrome/core/agents/lastfm"
+
 	"github.com/google/wire"
 	"github.com/navidrome/navidrome/core"
 	"github.com/navidrome/navidrome/persistence"
@@ -21,6 +23,7 @@ var allProviders = wire.NewSet(
 	subsonic.New,
 	nativeapi.New,
 	persistence.New,
+	lastfm.NewRouter,
 	GetBroker,
 )
 
@@ -41,6 +44,12 @@ func CreateSubsonicAPIRouter() *subsonic.Router {
 	panic(wire.Build(
 		allProviders,
 		GetScanner,
+	))
+}
+
+func CreateLastFMRouter() *lastfm.Router {
+	panic(wire.Build(
+		allProviders,
 	))
 }
 
