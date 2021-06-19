@@ -10,28 +10,28 @@ import { useInterval } from '../common'
 import { baseUrl, openInNewTab } from '../utils'
 
 const Progress = (props) => {
-  const {setLinked, setCheckingLink} = props
+  const { setLinked, setCheckingLink } = props
   const translate = useTranslate()
   const notify = useNotify()
   let linkCheckDelay = 2000
   let linkChecks = 5
-    // openInNewTab(
-    //   '/api/lastfm/link'
-    // )
+  // openInNewTab(
+  //   '/api/lastfm/link'
+  // )
 
-    const endChecking = (success) => {
-      linkCheckDelay = null
-      setCheckingLink(false)
-      if (success) {
-        notify(translate('Last.fm successfully linked!'), 'success')
-      } else {
-        notify(translate('Last.fm could not be linked'), 'warning')
-      }
-      setLinked(success)
+  const endChecking = (success) => {
+    linkCheckDelay = null
+    setCheckingLink(false)
+    if (success) {
+      notify(translate('Last.fm successfully linked!'), 'success')
+    } else {
+      notify(translate('Last.fm could not be linked'), 'warning')
     }
+    setLinked(success)
+  }
 
-    useInterval(() => {
-      fetch(baseUrl(`/api/lastfm/link/status?c=${linkChecks}`))
+  useInterval(() => {
+    fetch(baseUrl(`/api/lastfm/link/status?c=${linkChecks}`))
       .then((response) => response.text())
       .then((response) => {
         if (response === 'true') {
@@ -43,12 +43,12 @@ const Progress = (props) => {
         throw new Error(error)
       })
 
-      if (--linkChecks === 0) {
-        endChecking(false)
-      }
-    }, linkCheckDelay)
+    if (--linkChecks === 0) {
+      endChecking(false)
+    }
+  }, linkCheckDelay)
 
-  return linkChecks > 0 && <LinearProgress />
+  return <LinearProgress />
 }
 
 export const ScrobbleToggle = (props) => {
@@ -76,7 +76,9 @@ export const ScrobbleToggle = (props) => {
         }
         label={<span>{translate('Scrobble to Last.FM')}</span>}
       />
-      {checkingLink && <Progress setLinked={setLinked} setCheckingLink={setCheckingLink} />}
+      {checkingLink && (
+        <Progress setLinked={setLinked} setCheckingLink={setCheckingLink} />
+      )}
     </FormControl>
   )
 }
