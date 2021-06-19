@@ -6,58 +6,44 @@ import {
   LinearProgress,
   Switch,
 } from '@material-ui/core'
-import { useInterval } from '../common'
 import { baseUrl, openInNewTab } from '../utils'
 
-const Progress = (props) => {
-  const { setLinked, setCheckingLink } = props
+export const ScrobbleToggle = (props) => {
   const translate = useTranslate()
   const notify = useNotify()
-  let linkCheckDelay = 2000
-  let linkChecks = 5
-  // openInNewTab(
-  //   '/api/lastfm/link'
-  // )
+  const [linked, setLinked] = useState(false)
+  const [checkingLink, setCheckingLink] = useState(false)
 
-  const endChecking = (success) => {
-    linkCheckDelay = null
-    setCheckingLink(false)
+  const checkResult = (success) => {
     if (success) {
       notify(translate('Last.fm successfully linked!'), 'success')
     } else {
       notify(translate('Last.fm could not be linked'), 'warning')
     }
     setLinked(success)
+    setCheckingLink(false)
   }
 
-  useInterval(() => {
-    fetch(baseUrl(`/api/lastfm/link/status?c=${linkChecks}`))
-      .then((response) => response.text())
-      .then((response) => {
-        if (response === 'true') {
-          endChecking(true)
-        }
-      })
-      .catch((error) => {
-        endChecking(false)
-        throw new Error(error)
-      })
-
-    if (--linkChecks === 0) {
-      endChecking(false)
-    }
-  }, linkCheckDelay)
-
-  return <LinearProgress />
-}
-
-export const ScrobbleToggle = (props) => {
-  const translate = useTranslate()
-  const [linked, setLinked] = useState(false)
-  const [checkingLink, setCheckingLink] = useState(false)
   const toggleScrobble = () => {
     if (!linked) {
-      return setCheckingLink(true)
+      setCheckingLink(true)
+      openInNewTab(
+        // '/api/lastfm/link'
+        'https://www.last.fm/api/auth/?api_key=9b94a5515ea66b2da3ec03c12300327e&cb=http://localhost:4533/test.html'
+      )
+        .then(() => {
+          fetch(baseUrl('/api/lastfm/link/status'))
+            .then((response) => response.text())
+            .then((response) => {
+              checkResult(response === 'true')
+            })
+            .catch((error) => {
+              checkResult(false)
+              throw new Error(error)
+            })
+        })
+        .catch(() => checkResult(false))
+      return
     }
     setLinked(!linked)
   }
@@ -76,9 +62,7 @@ export const ScrobbleToggle = (props) => {
         }
         label={<span>{translate('Scrobble to Last.FM')}</span>}
       />
-      {checkingLink && (
-        <Progress setLinked={setLinked} setCheckingLink={setCheckingLink} />
-      )}
+      {checkingLink && <LinearProgress />}
     </FormControl>
   )
 }

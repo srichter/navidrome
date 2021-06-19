@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Testing</title>
+  </head>
+  <body>
+    <p>Closing in 5</p>
+    <script>
+      setTimeout(() => {
+        const opener = window.opener
+        opener.postMessage('lastfm-link-complete')
+        window.close()
+      }, 5000)
+    </script>
+  </body>
+</html>
